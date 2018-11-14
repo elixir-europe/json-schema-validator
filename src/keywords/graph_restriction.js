@@ -3,10 +3,7 @@ const request = require("request-promise");
 const logger = require("../winston");
 const CustomAjvError = require("../model/custom-ajv-error");
 const curies = require ("../utils/curie_expansion");
-const config = require('config');
 
-const olsConnectionConfig = config.get("OLS_API.connection");
-const olsSearchUrl = olsConnectionConfig["scheme"] + "://" + olsConnectionConfig["host"] + ":" + olsConnectionConfig["port"] + "/api/search?q="
 const cachedOlsResponses = {};
 
 async function callCurieExpansion(terms){
@@ -41,6 +38,7 @@ module.exports = function graph_restriction(ajv) {
 
                 callCurieExpansion(parentTerms).then((iris) => {
 
+                  const olsSearchUrl = "https://www.ebi.ac.uk/ols/api/search?q=";
                   const parentTerm = iris.join(",");
                   const ontologyId = ontologyIds.join(",").replace(/obo:/g, "");
 

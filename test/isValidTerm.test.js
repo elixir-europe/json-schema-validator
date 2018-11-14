@@ -1,5 +1,6 @@
 const fs = require("fs");
-const runValidation = require("../src/validation/validator");
+const ElixirValidator = require('../src/elixir-validator');
+const IsValidTerm = require('../src/keywords/isvalidterm');
 
 test("isValidTerm", () => {
   let inputSchema = fs.readFileSync("examples/schemas/isValidTerm-schema.json");
@@ -8,8 +9,12 @@ test("isValidTerm", () => {
   let inputObj = fs.readFileSync("examples/objects/isValidTerm.json");
   let jsonObj = JSON.parse(inputObj);
 
-  return runValidation.validateSingleSchema(jsonSchema, jsonObj).then( (data) => {
-    expect(data).toBeDefined();
-    expect(data[0]).toBeDefined();
-  });
+  const ingestValidator = new ElixirValidator([IsValidTerm]);
+
+  return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
+        expect(data).toBeDefined();
+        expect(data.validationErrors.length).toBe(1);
+        expect(data.validationErrors[0].userFriendlyMessage).toContain('provided term does not exist in OLS');
+
+    });
 });

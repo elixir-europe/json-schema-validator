@@ -1,9 +1,6 @@
 let request = require("request-promise");
 const logger = require("../winston");
-const config = require('config');
 
-const olsConnectionConfig = config.get("OLS_API.connection");
-const olsSearchUrl = olsConnectionConfig["scheme"] + "://" + olsConnectionConfig["host"] + ":" + olsConnectionConfig["port"] + "/api/search?q="
 const cachedOlsCurieResponses = {};
 
 module.exports = {
@@ -16,9 +13,13 @@ module.exports = {
         return curie;
     },
 
-    expandCurie: function(term){
+    expandCurie: function(term, olsApi){
+
+        if (!olsApi)
+            olsApi = "https://www.ebi.ac.uk/ols/api";
+
         const termUri = encodeURIComponent(term);
-        const url = olsSearchUrl + termUri
+        const url = olsApi + '/search?q=' + termUri
             + "&exact=true&groupField=true&queryFields=obo_id";
 
         return new Promise((resolve, reject) => {
