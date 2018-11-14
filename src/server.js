@@ -1,16 +1,25 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require("./winston");
-const validator = require("./validation/validator");
 const AppError = require("./model/application-error");
 const { check, validationResult } = require("express-validator/check");
 // const { handleValidation } = require("./validation/validation-handler");
+
+let ElixirValidator  = require('./elixir-validator');
+let GraphRestriction = require('./keywords/graph_restriction');
+let IsChildTermOf = require('./keywords/ischildtermof');
+let IsValidTerm = require('./keywords/isvalidterm');
 
 const argv = require("yargs").argv;
 const npid = require("npid");
 
 const app = express();
 const port = process.env.PORT || 3020;
+
+
+
+const elixirValidator = new ElixirValidator([GraphRestriction, IsChildTermOf, IsValidTerm]);
+
 
 // app.use(express.json());
 app.use(bodyParser.json({limit: '50mb'}));
@@ -44,7 +53,7 @@ app.post("/validate", [
     return res.status(422).json({ errors: errors.mapped() });
   } else {
     logger.log("debug", "Received POST request.");
-    validator.validateSingleSchema(req.body.schema, req.body.object).then((output) => {
+    elixirValidator.validate(req.body.schema, req.body.object).then((output) => {
       logger.log("silly", "Sent validation results.");
       res.status(200).send(output);
     }).catch((err) => {
@@ -54,24 +63,6 @@ app.post("/validate", [
   }
 });
 
-// -- Endpoint definition -- //
-app.post("/autovalidate", [
-    check("object", "Required.").exists()
-],(req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.mapped() });
-    } else {
-        logger.log("debug", "Received POST request.");
-        validator.autoValidate(req.body.object).then((output) => {
-            logger.log("silly", "Sent validation results.");
-            res.status(200).send(output);
-        }).catch((err) => {
-            logger.log("error", err.message);
-            res.status(500).send(new AppError(err.message));
-        });
-    }
-});
 
 app.get("/validate", (req, res) => {
   logger.log("silly", "Received GET request.");
@@ -81,51 +72,10 @@ app.get("/validate", (req, res) => {
       schema: {},
       object: {}
     },
-    repository: "https://github.com/HumanCellAtlas/ingest-validator-js"
+    repository: "https://github.com/elixir-europe/json-schema-validator"
   });
 });
 
-app.post("/validateRefs", [
-    check("schemas", "Required and must be a non empty array.").isArray().not().isEmpty(),
-    check("rootSchemaId", "Required.").optional(),
-    check("entity", "Required.").exists()
-  ], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.mapped() });
-    } else {
-      logger.log("debug", "Received POST request.");
-        validator.validateMultiSchema(req.body.schemas, req.body.entity, req.body.rootSchemaId).then((output) => {
-            logger.log("silly", "Sent validation results.");
-            res.status(200).send(output);
-        }).catch((err) => {
-            logger.log("error", err.message);
-            res.status(500).send(new AppError(err.message));
-        });
-      // try {
-      //   let errors = handleValidation(req.body.schemas, req.body.entity, req.body.rootSchemaId);
-      //   // return res.json(errors || []);
-      //     return res.json(errors);
-      // } catch(err) {
-      //   logger.log("error", err);
-      //   return res.status(500).send(new AppError(err.message));
-      // }
-    }
-  }
-);
-
-app.get("/validateRefs", (req, res) => {
-  logger.log("silly", "Received GET request.");
-  res.send({
-    message: "This is the Submissions JSON Schema Validator. Please POST to this endpoint the schema and object to validate structured as showed in bodyStructure.",
-    bodyStructure: {
-      schemas: [],
-      rootSchemaId: "",
-      entity: {}
-    },
-    repository: "https://github.com/HumanCellAtlas/ingest-validator-js"
-  });
-});
 
 app.listen(port, () => {
   logger.log("info", ` -- Started server on port ${port} --`);

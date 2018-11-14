@@ -1,5 +1,5 @@
 {
-  "name": "elixir-ajv-keywords",
+  "name": "elixir-json-schema-validator",
   "version": "1.0.0",
   "description": "Custom JSON-Schema keywords for Ajv validator",
   "main": "index.js",
