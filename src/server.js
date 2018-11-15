@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const logger = require("./winston");
 const AppError = require("./model/application-error");
 const { check, validationResult } = require("express-validator/check");
-// const { handleValidation } = require("./validation/validation-handler");
+const path = require('path')
 
 let ElixirValidator  = require('./elixir-validator');
 let GraphRestriction = require('./keywords/graph_restriction');
@@ -15,11 +15,9 @@ const npid = require("npid");
 
 const app = express();
 const port = process.env.PORT || 3020;
-
-
-
 const elixirValidator = new ElixirValidator([GraphRestriction, IsChildTermOf, IsValidTerm]);
 
+app.use(express.static('src/views'));
 
 // app.use(express.json());
 app.use(bodyParser.json({limit: '50mb'}));

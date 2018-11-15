@@ -30,6 +30,8 @@
     "express": "^4.16.2",
     "express-validator": "^5.2.0",
     "npid": "^0.4.0",
+    "path": "^0.12.7",
+    "pug": "^2.0.3",
     "rambda": "^1.2.0",
     "request": "^2.83.0",
     "request-defaults": "^1.2.0",
@@ -41,7 +43,7 @@
   },
   "devDependencies": {
     "jest": "^22.4.3",
-    "nodemon": "^1.17.5"
+    "nodemon": "^1.18.6"
   },
   "jest": {
     "verbose": true,
