@@ -20,11 +20,26 @@
     <link type="text/css" rel="stylesheet" href="https://www.elixir-europe.org/sites/default/files/css/css_kq7aQIivPRxmKwpRF4zDy7tVwdNjWHKBFWnt8BFr3QE.css" media="screen" />
     <link type="text/css" rel="stylesheet" href="https://www.elixir-europe.org/sites/default/files/css/css_buIuAc05O607bLWgjOFN-QaFxTW7f4MVDLrd_yqZmCc.css" media="print" />
     <link type="text/css" rel="stylesheet" href="https://www.elixir-europe.org/sites/default/files/css/css_6rEIa2oHdO8QYKWF5kH_5jnDcPW0kRgmrnNnKANgn-E.css" media="only screen" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <!--[if lt IE 9]>
     <link type="text/css" rel="stylesheet" href="https://www.elixir-europe.org/sites/default/files/css/css_3N1IuVi0VQRKfmilefgd9bEoo0mqJAzbLCyAwn1HFaE.css" media="screen" />
     <![endif]-->
     <script type="text/javascript" src="https://www.elixir-europe.org/sites/default/files/js/js_gZMBtDw_x_asFO_93fRFp1i1Py4R0zzduUcn0P06zeY.js"></script>
+
+    <style>
+        .row {
+            display: flex;
+            flex-direction: row;
+        }
+        .left {
+            flex: 1;
+
+        }
+        .right {
+            flex: 1;
+        }
+    </style>
 </head>
 <body class="html front not-logged-in one-sidebar sidebar-second page-node page-node- page-node-1010 node-type-page site-name-hidden atr-7.x-3.x site-name-elixir">
 <div id="skip-link" class="nocontent">
@@ -77,12 +92,16 @@
 
                     </section>
 
-                    <section>
+                    <section class="row">
 
-                        <div style="float: left;" class="grid_8 alpha">
-                            <div lass="bloc_left">
+                        <div  class="left">
+                            <div class="bloc_left">
                                 <form>
                                     <div>
+                                        <span><a id="load" href="#">Load sample data</a></span>
+                                        <div style="display: inline;">
+                                            <button id="validate" value="Validate">Validate</button>
+                                        </div>
                                         <div class="horiz">
                                             <label for="input">Schema:</label>
                                             <span class="error starthidden" style="display: none;" id="input-invalid">Invalid JSON parse error, <a id="input-link" href="#"></a></span>
@@ -96,22 +115,22 @@
                                         <textarea name="input2" rows="20" cols="60" class="half"
                                                   id="input2" placeholder="Enter JSON instance to validate against the schema..." ></textarea>
 
-                                        <div class="horiz">
-                                            <input type="submit" value="Validate">
-                                            <span>(<a id="load" href="#">load sample data</a>)</span>
-                                        </div>
+
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        <div style="float: right;" class="grid_8 omega">
-                            <div lass="bloc_right">
+                        <div style="margin-left: 2%" class="right">
+                            <div >
                                 <div>
-                                    <div class="horiz">
-                                        <label>Validation results:</label>
-                                        <span class="error starthidden" style="display: none;" id="processingFailure">failure</span>
-                                        <span class="success starthidden" style="display: none;" id="processingSuccess">success</span>
+                                    <div style="text-align: left;" class="horiz">
+                                        <span style="font-weight: bold; ">Validation results:</span>
+                                        <br/>
+                                        <span id="failed" style="display: none;color : red;" id="processingFailure">INVALID</span>
+                                        <span id= "valid" style="display: none;color : green;" id="processingSuccess">VALID</span>
+                                        <div id="results"></div>
+
                                     </div>
                                 </div>
 
@@ -129,4 +148,109 @@
     </div>
 </div>
 </body>
+<script>
+
+    $(document).ready(function() {
+
+        $("#results").val("")
+
+        $("#load").click(function(evt) {
+            evt.preventDefault();
+            schema = {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+
+                "type": "object",
+                "properties": {
+                    "alias": {
+                        "description": "A sample unique identifier in a submission.",
+                        "type": "string"
+                    },
+                    "taxonId": {
+                        "description": "The taxonomy id for the sample species.",
+                        "type": "integer"
+                    },
+                    "taxon": {
+                        "description": "The taxonomy name for the sample species.",
+                        "type": "string"
+                    },
+                    "releaseDate": {
+                        "description": "Date from which this sample is released publicly.",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "disease": {
+                        "description": "The disease for the sample species.",
+                        "type": "string"
+                    },
+                    "disease_id": {
+                        "description": "The ontology id for the disease sample species.",
+                        "type": "string",
+                        "graph_restriction":  {
+                            "ontologies" : ["obo:mondo", "obo:efo"],
+                            "classes": ["MONDO:0000001","PATO:0000461"],
+                            "relations": ["rdfs:subClassOf"],
+                            "direct": false,
+                            "include_self": true
+                        }
+                    }
+                },
+                "required": ["alias", "taxonId" ]
+            };
+            object = {
+                "alias": "MA456",
+                "taxonId": 9606,
+                "disease": "glioblastoma",
+                "disease_id": "MONDO:0018177"
+            };
+            $("#input").val(JSON.stringify(schema, null, 2));
+            $("#input2").val(JSON.stringify(object, null, 2));
+        });
+
+        $( "#validate" ).click(function( event ) {
+            event.preventDefault();
+        }).bind("click", function (e) {
+
+            var schema = JSON.parse($("#input").val());
+            var instance = JSON.parse($("#input2").val());
+
+            var submit = {
+                "schema" : schema,
+                "object" : instance
+            };
+
+
+            $.ajax({
+                type: "POST",
+                url: 'validate',
+                data: JSON.stringify(submit),
+                success: function (response) {
+
+                    if (response.validationState == "VALID") {
+                        $("#valid").show()
+                        $("#failed").hide()
+                    }
+                    else {
+                        $("#valid").hide()
+                        $("#failed").show()
+                        $('#results').append("<ul id='cList'></ul>");
+                        for (i = 0; i < response.validationErrors.length; i++) {
+                            $("#cList").append("<li><span style=\"colour: red;\">" +
+                                response.validationErrors[i].userFriendlyMessage + "</span></li>");
+                        }
+
+                    }
+                },
+                contentType: 'application/json'
+            });
+
+
+        });
+
+
+
+    });
+
+
+
+</script>
 </html>

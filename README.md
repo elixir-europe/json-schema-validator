@@ -42,7 +42,7 @@ npm -v
 #### Project
 Clone project and install dependencies:
 ```
-git clone https://github.com/EMBL-EBI-SUBS/json-schema-validator.git
+git clone https://github.com/elixir-europe/json-schema-validator.git
 cd json-schema-validator
 npm install
 ```
@@ -79,11 +79,11 @@ Note: This is the **file path** and not just the directory it will be written to
 ### Executing with Docker
 1. Build docker image:
 ```
-docker build -t subs/json-schema-validator .
+docker build -t elixir-jsonschema-validator .
 ```
 2. Run docker image:
 ```
-docker run -p 3020:3020 -d subs/json-schema-validator
+docker run -p 3020:3020 -d elixir-jsonschema-validator
 ```
 ### Development
 For development purposes using [nodemon](https://nodemon.io/) is useful. It reloads the application everytime something has changed on save time.
