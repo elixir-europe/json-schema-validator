@@ -6,6 +6,8 @@ const curies = require ("../utils/curie_expansion");
 
 const cachedOlsResponses = {};
 
+defaultOlsOptions = {olsApiBaseUrl: 'https://www.ebi.ac.uk/ols/api'};
+
 async function callCurieExpansion(terms){
     let expanded = terms.map(async(t) => {
       if (curies.isCurie(t)){
@@ -21,9 +23,14 @@ async function callCurieExpansion(terms){
     return iris;
 }
 
-module.exports = function graph_restriction(ajv) {
+module.exports = function graph_restriction(ajv, options) {
 
-  function findChildTerm(schema, data) {
+    let allOptions = defaultOlsOptions;
+    if (options) {
+        allOptions = Object.assign(options, defaultOlsOptions);
+    }
+
+    function findChildTerm(schema, data) {
     return new Promise((resolve, reject) => {
         let parentTerms = schema.classes;
         const ontologyIds = schema.ontologies;
@@ -38,7 +45,7 @@ module.exports = function graph_restriction(ajv) {
 
                 callCurieExpansion(parentTerms).then((iris) => {
 
-                  const olsSearchUrl = "https://www.ebi.ac.uk/ols/api/search?q=";
+                  const olsSearchUrl = allOptions.olsApiBaseUrl + "/search?q=";
                   const parentTerm = iris.join(",");
                   const ontologyId = ontologyIds.join(",").replace(/obo:/g, "");
 

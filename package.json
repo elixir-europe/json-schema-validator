@@ -1,6 +1,6 @@
 {
   "name": "elixir-jsonschema-validator",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Custom JSON-Schema keywords for Ajv validator and validation service with API",
   "main": "index.js",
   "repository": "https://github.com/elixir-europe/json-schema-validator.git",

@@ -9,6 +9,18 @@ test("Empty Schema (empty object)", () => {
     });
 });
 
+test("Test custom ref", () => {
+    const ingestValidator = new ElixirValidator([], {loadSchema: blah()});
+    return ingestValidator.validate({}, {}).then( (data) => {
+        expect(data).toBeDefined();
+        expect(data.validationState).toBe("VALID");
+    });
+});
+
+function blah() {
+
+}
+
 test("Attributes Schema", () => {
     let inputSchema = fs.readFileSync("examples/schemas/attributes-schema.json");
     let jsonSchema = JSON.parse(inputSchema);

@@ -13,16 +13,24 @@ let Ajv = require("ajv");
 const request = require("request-promise");
 const cachedSchemas = {};
 
+
 /**
  *
  * Wraps the generic validator, outputs errors in custom format.
  *
  */
 class ElixirValidator {
-    constructor(keywords) {
+    constructor(keywords, options) {
         this.schemaCache = {};
         this.validatorCache = {};
-        this.ajv = new Ajv({allErrors: true, schemaId: 'auto', loadSchema: this.loadSchemaRef});
+        let defaultAjvOptions = {allErrors: true, schemaId: 'auto', loadSchema: this.loadSchemaRef};
+
+        let allOptions = defaultAjvOptions;
+        if (options) {
+            allOptions = Object.assign(options, defaultAjvOptions);
+        }
+
+        this.ajv = new Ajv(allOptions);
         this.ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
 
         if (Array.isArray(keywords)) {
