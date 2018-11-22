@@ -23,14 +23,20 @@ class ElixirValidator {
     constructor(keywords, options) {
         this.schemaCache = {};
         this.validatorCache = {};
-        let defaultAjvOptions = {allErrors: true, schemaId: 'auto', loadSchema: this.loadSchemaRef};
 
-        let allOptions = defaultAjvOptions;
         if (options) {
-            allOptions = Object.assign(options, defaultAjvOptions);
+            options['allErrors'] = true;
+            options['schemaId'] = 'auto'
+            if (!options.loadSchema) {
+                options[loadSchema] = this.loadSchemaRef;
+            }
+
+        } else {
+            options = {allErrors: true, schemaId: 'auto', loadSchema: this.loadSchemaRef};
         }
 
-        this.ajv = new Ajv(allOptions);
+
+        this.ajv = new Ajv(options);
         this.ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
 
         if (Array.isArray(keywords)) {

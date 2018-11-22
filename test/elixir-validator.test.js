@@ -10,15 +10,14 @@ test("Empty Schema (empty object)", () => {
 });
 
 test("Test custom ref", () => {
-    const ingestValidator = new ElixirValidator([], {loadSchema: blah()});
-    return ingestValidator.validate({}, {}).then( (data) => {
-        expect(data).toBeDefined();
-        expect(data.validationState).toBe("VALID");
+    const ingestValidator = new ElixirValidator([], {loadSchema: blah});
+    return ingestValidator.validate({ "$ref" : 'somepath'}, {}).catch( (error) => {
+        expect(error.message).toBe("blah function called");
     });
 });
 
-function blah() {
-
+function blah(path) {
+    throw new Error('blah function called');
 }
 
 test("Attributes Schema", () => {
