@@ -108,3 +108,18 @@ test("FAANG Schema - \'cell line\' sample", () => {
         expect(data.validationErrors.length).toBe(0);
     });
 });
+
+test("Test HCA data", () => {
+    let inputSchema = fs.readFileSync("examples/schemas/analysis_process.json");
+    let jsonSchema = JSON.parse(inputSchema);
+
+    let inputObj = fs.readFileSync("examples/objects/test_pass_new_analysis_process.json");
+    let jsonObj = JSON.parse(inputObj);
+
+    const elixirValidator = new ElixirValidator([IsChildTerm], {baseSchemaPath: '/Users/jupp/dev/hca/metadata-schema/json_schema'});
+
+    return elixirValidator.validate(jsonSchema, jsonObj).then( (data) => {
+        expect(data).toBeDefined();
+        expect(data.validationErrors.length).toBe(2);
+    });
+});

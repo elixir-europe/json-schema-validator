@@ -5,6 +5,8 @@ const Promise = require('bluebird');
 const R = require('rambda');
 const logger = require("./winston");
 const curies = require ("./utils/curie_expansion");
+const path = require("path");
+const fs = require('fs');
 
 const ErrorReport = require('./model/error-report');
 const ValidationReport = require('./model/validation-report');
@@ -23,12 +25,17 @@ class ElixirValidator {
     constructor(keywords, options) {
         this.schemaCache = {};
         this.validatorCache = {};
+        this.baseSchemaPath = null;
 
         if (options) {
             options['allErrors'] = true;
-            options['schemaId'] = 'auto'
+            options['schemaId'] = 'auto';
             if (!options.loadSchema) {
-                options[loadSchema] = this.loadSchemaRef;
+                options.loadSchema = this.loadSchemaRef;
+            }
+
+            if (options.baseSchemaPath) {
+                this.baseSchemaPath = options.baseSchemaPath
             }
 
         } else {
@@ -47,23 +54,36 @@ class ElixirValidator {
     }
 
     loadSchemaRef(uri) {
+
+
         if(cachedSchemas[uri]) {
             return Promise.resolve(cachedSchemas[uri]);
         } else {
-            return new Promise((resolve, reject) => {
-                request({
-                    method: "GET",
-                    url: uri,
-                    json: true
-                }).then(resp => {
-                    const loadedSchema = resp;
-                    loadedSchema["$async"] = true;
-                    cachedSchemas[uri] = loadedSchema;
-                    resolve(loadedSchema);
-                }).catch(err => {
-                    reject(err);
+            if (this.baseSchemaPath) {
+                let ref = path.join(this.baseSchemaPath, uri);
+                console.log('loading ref ' + ref);
+                let jsonSchema = fs.readFileSync(ref);
+                let loadedSchema = JSON.parse(jsonSchema);
+                loadedSchema["$async"] = true;
+                cachedSchemas[uri] = loadedSchema;
+                return Promise.resolve(loadedSchema);
+            }
+            else {
+                return new Promise((resolve, reject) => {
+                    request({
+                        method: "GET",
+                        url: uri,
+                        json: true
+                    }).then(resp => {
+                        const loadedSchema = resp;
+                        loadedSchema["$async"] = true;
+                        cachedSchemas[uri] = loadedSchema;
+                        resolve(loadedSchema);
+                    }).catch(err => {
+                        reject(err);
+                    });
                 });
-            });
+            }
         }
     }
 
