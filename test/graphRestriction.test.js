@@ -3,7 +3,7 @@ const ElixirValidator = require('../src/elixir-validator');
 const GraphRestriction = require('../src/keywords/graph_restriction');
 
 
-test(" -> graphRestriction Schema", () => {
+test(" -> graphRestriction 1 Schema", () => {
     let inputSchema = fs.readFileSync("examples/schemas/graphRestriction-schema.json");
     let jsonSchema = JSON.parse(inputSchema);
 
@@ -18,12 +18,13 @@ test(" -> graphRestriction Schema", () => {
 
 });
 
-test(" -> graphRestriction Schema", () => {
+test(" -> graphRestriction 2 Schema", () => {
     let inputSchema = fs.readFileSync("examples/schemas/graphRestriction-schema.json");
     let jsonSchema = JSON.parse(inputSchema);
 
     let inputObj = fs.readFileSync("examples/objects/graphRestriction_normal.json");
     let jsonObj = JSON.parse(inputObj);
+
 
     const ingestValidator = new ElixirValidator([GraphRestriction]);
 
@@ -32,12 +33,13 @@ test(" -> graphRestriction Schema", () => {
     });
 });
 
-test(" -> graphRestriction Schema", () => {
+test(" -> graphRestriction 3 Schema", () => {
     let inputSchema = fs.readFileSync("examples/schemas/graphRestriction-schema.json");
     let jsonSchema = JSON.parse(inputSchema);
 
     let inputObj = fs.readFileSync("examples/objects/graphRestriction_fail.json");
     let jsonObj = JSON.parse(inputObj);
+
 
     const ingestValidator = new ElixirValidator([GraphRestriction]);
 

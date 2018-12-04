@@ -7,6 +7,7 @@ const logger = require("./winston");
 const curies = require ("./utils/curie_expansion");
 const path = require("path");
 const fs = require('fs');
+const md5 = require('md5');
 
 const ErrorReport = require('./model/error-report');
 const ValidationReport = require('./model/validation-report');
@@ -48,7 +49,7 @@ class ElixirValidator {
 
         if (Array.isArray(keywords)) {
             for (let keyword of keywords) {
-                new keyword(this.ajv)
+                new keyword(this.ajv, options)
             }
         }
     }
@@ -100,7 +101,7 @@ class ElixirValidator {
 
     _validateSingleSchema (inputSchema, inputObject) {
         inputSchema["$async"] = true;
-        const schemaId = !inputSchema['$id'] ? inputSchema : inputSchema['$id'];
+        const schemaId = !inputSchema['$id'] ? md5(JSON.stringify(inputSchema)) : inputSchema['$id'];
 
         logger.log("silly", "Running validation...");
         return new Promise((resolve, reject) => {
