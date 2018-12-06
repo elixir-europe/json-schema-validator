@@ -27,7 +27,7 @@ module.exports = function graph_restriction(ajv, options) {
 
     let allOptions = defaultOlsOptions;
     if (options) {
-        allOptions = Object.assign(options, defaultOlsOptions);
+        allOptions = Object.assign(defaultOlsOptions, options);
     }
 
     function findChildTerm(schema, data) {
