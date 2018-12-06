@@ -8,10 +8,10 @@ const cachedOlsResponses = {};
 
 defaultOlsOptions = {olsApiBaseUrl: 'https://www.ebi.ac.uk/ols/api'};
 
-async function callCurieExpansion(terms){
+async function callCurieExpansion(terms, baseUrl){
     let expanded = terms.map(async(t) => {
       if (curies.isCurie(t)){
-          const iri = await curies.expandCurie(t);
+          const iri = await curies.expandCurie(t, baseUrl);
           return iri;
       }
       else {
@@ -43,7 +43,7 @@ module.exports = function graph_restriction(ajv, options) {
             }
             else {
 
-                callCurieExpansion(parentTerms).then((iris) => {
+                callCurieExpansion(parentTerms,  allOptions.olsApiBaseUrl).then((iris) => {
 
                   const olsSearchUrl = allOptions.olsApiBaseUrl + "/search?q=";
                   const parentTerm = iris.join(",");
