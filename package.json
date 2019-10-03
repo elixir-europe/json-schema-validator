@@ -1,6 +1,6 @@
 {
   "name": "elixir-jsonschema-validator",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Custom JSON-Schema keywords for Ajv validator and validation service with API",
   "main": "index.js",
   "repository": "https://github.com/elixir-europe/json-schema-validator.git",
@@ -36,7 +36,7 @@
     "rambda": "^1.2.0",
     "request": "^2.83.0",
     "request-defaults": "^1.2.0",
-    "request-promise": "^4.2.2",
+    "request-promise": "^4.2.4",
     "winston": "^3.0.0-rc6",
     "winston-daily-rotate-file": "^3.2.1",
     "yargs": "^11.0.0",
