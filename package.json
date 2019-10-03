@@ -1,17 +1,17 @@
 {
   "name": "elixir-jsonschema-validator",
-  "version": "1.3.8",
+  "version": "1.4.0",
   "description": "Custom JSON-Schema keywords for Ajv validator and validation service with API",
   "main": "index.js",
   "repository": "https://github.com/elixir-europe/json-schema-validator.git",
   "scripts": {
     "start": "node src/server.js",
-    "test": "jest",
+    "test": "jest -i",
     "test-watch": "nodemon --exec \"npm test\"",
     "travis-test": "jest test/elixir-validator.test.js"
   },
   "engines": {
-    "node": "8.11.1"
+    "node": "10.16.3"
   },
   "keywords": [
     "nodejs",
@@ -23,8 +23,8 @@
   "author": "EMBL-EBI-SUBS, fpenim, rolando-ebi, simonjupp",
   "license": "Apache-2.0",
   "dependencies": {
-    "ajv": "^6.0.0",
-    "amqplib": "^0.5.2",
+    "ajv": "^6.10.2",
+    "amqplib": "^0.5.5",
     "bluebird": "^3.5.1",
     "dnscache": "^1.0.1",
     "express": "^4.16.2",
@@ -37,14 +37,14 @@
     "request": "^2.83.0",
     "request-defaults": "^1.2.0",
     "request-promise": "^4.2.2",
-    "update": "^0.7.4",
     "winston": "^3.0.0-rc6",
     "winston-daily-rotate-file": "^3.2.1",
     "yargs": "^11.0.0",
-    "event-stream": "=3.3.4"
+    "event-stream": "=3.3.4",
+    "set-value": "^v3.0.1"
   },
   "devDependencies": {
-    "jest": "^22.4.3",
+    "jest": "24.9.0",
     "nodemon": "^1.18.6"
   },
   "jest": {

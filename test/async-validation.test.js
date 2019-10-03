@@ -120,6 +120,6 @@ test("Test HCA data", () => {
 
     return elixirValidator.validate(jsonSchema, jsonObj).then( (data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(2);
+        expect(data.validationErrors.length).toBe(4);
     });
 });

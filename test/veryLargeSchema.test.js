@@ -1,5 +1,6 @@
 const fs = require("fs");
 const ElixirValidator = require('../src/elixir-validator');
+jest.setTimeout(30000);
 
 test("HCA ref schema, species and restriction schema test very large schema no errors", () => {
     let hcaSchemas = fs.readFileSync("examples/schemas/references/hca_donor_organism.json");
