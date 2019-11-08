@@ -38,7 +38,7 @@ class GraphRestriction {
         return true;
     }
 
-     generateKeywordFunction() {
+    generateKeywordFunction() {
 
         const olsSearchUrl = `${this.olsBaseUrl}/search?q=`;
         const cachedOlsResponses = {};
