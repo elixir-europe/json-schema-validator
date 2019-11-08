@@ -16,4 +16,5 @@ test("isValidTerm", () => {
     expect(data.length).toBe(1);
     expect(data[0].message).toContain('provided term does not exist in OLS');
   });
+
 });
