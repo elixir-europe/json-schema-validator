@@ -19,7 +19,6 @@ test("Attributes Schema", () => {
     const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(jsonSchema, jsonObj).then((data) => {
-        console.log('data', data);
         expect(data).toBeDefined();
         expect(data.length).toBe(1);
         expect(data[0].message).toContain('should match format "uri"');

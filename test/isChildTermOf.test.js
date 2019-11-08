@@ -13,10 +13,10 @@ test("isChildTermOf", () => {
 
   const ingestValidator = new ElixirValidator([new IsChildTermOf(null, "https://www.ebi.ac.uk/ols/api/search?q=")]);
 
-  return ingestValidator.validateSingleSchema(jsonSchema, jsonObj).then((data) => {
+  return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(1);
-        expect(data.validationErrors[0].userFriendlyMessage).toContain('provided term does not exist in OLS');
+        expect(data.length).toBe(1);
+        expect(data[0].message).toContain('Provided term is not child of');
 
     });
 });
