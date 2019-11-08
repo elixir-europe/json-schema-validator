@@ -1,15 +1,17 @@
 const fs = require("fs");
 const ElixirValidator = require('../src/elixir-validator');
-const IsValidTerm = require('../src/keywords/isvalidterm');
+const IsChildTermOf = require('../src/keywords/ischildtermof');
 
-test("isValidTerm", () => {
-  let inputSchema = fs.readFileSync("examples/schemas/isValidTerm-schema.json");
+test("isChildTermOf", () => {
+  let inputSchema = fs.readFileSync("examples/schemas/isChildTerm-schema.json");
   let jsonSchema = JSON.parse(inputSchema);
 
-  let inputObj = fs.readFileSync("examples/objects/isValidTerm.json");
+  let inputObj = fs.readFileSync("examples/objects/isChildTerm.json");
   let jsonObj = JSON.parse(inputObj);
 
-  const ingestValidator = new ElixirValidator([new IsValidTerm(null, "https://www.ebi.ac.uk/ols/api/search?q=")]);
+
+
+  const ingestValidator = new ElixirValidator([new IsChildTermOf(null, "https://www.ebi.ac.uk/ols/api/search?q=")]);
 
   return ingestValidator.validateSingleSchema(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
