@@ -2,23 +2,12 @@ const fs = require("fs");
 const ElixirValidator = require('../src/elixir-validator');
 
 test("Empty Schema (empty object)", () => {
-    const ingestValidator = new ElixirValidator();
+    const ingestValidator = new ElixirValidator([]);
     return ingestValidator.validate({}, {}).then( (data) => {
         expect(data).toBeDefined();
-        expect(data.validationState).toBe("VALID");
+        expect(data.length).toBe(0);
     });
 });
-
-test("Test custom ref", () => {
-    const ingestValidator = new ElixirValidator([], {loadSchema: blah});
-    return ingestValidator.validate({ "$ref" : 'somepath'}, {}).catch( (error) => {
-        expect(error.message).toBe("blah function called");
-    });
-});
-
-function blah(path) {
-    throw new Error('blah function called');
-}
 
 test("Attributes Schema", () => {
     let inputSchema = fs.readFileSync("examples/schemas/attributes-schema.json");
@@ -27,12 +16,13 @@ test("Attributes Schema", () => {
     let inputObj = fs.readFileSync("examples/objects/attributes.json");
     let jsonObj = JSON.parse(inputObj);
 
-    const elixirValidator = new ElixirValidator();
+    const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(jsonSchema, jsonObj).then((data) => {
+        console.log('data', data);
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(1);
-        expect(data.validationErrors[0].userFriendlyMessage).toContain('should match format "uri"');
+        expect(data.length).toBe(1);
+        expect(data[0].message).toContain('should match format "uri"');
     });
 });
 
@@ -44,11 +34,11 @@ test("BioSamples Schema - FAANG \'organism\' sample", () => {
     let inputObj = fs.readFileSync("examples/objects/faang-organism-sample.json");
     let jsonObj = JSON.parse(inputObj);
 
-    const elixirValidator = new ElixirValidator();
+    const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(0);
+        expect(data.length).toBe(0);
     });
 });
 
@@ -58,10 +48,10 @@ test("Study Schema", () => {
 
     let inputObj = fs.readFileSync("examples/objects/study.json");
     let jsonObj = JSON.parse(inputObj);
-    const elixirValidator = new ElixirValidator();
+    const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(2);
+        expect(data.length).toBe(2);
     });
 });
