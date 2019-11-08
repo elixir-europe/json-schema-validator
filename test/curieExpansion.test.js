@@ -15,6 +15,4 @@ test("Curie expansion with no errors", () => {
     return curieExpansion.expandCurie(curie).then( (uri) => {
         expect(uri).toBe("http://www.ebi.ac.uk/efo/EFO_0000399");
     });
-
-
 });
