@@ -4,7 +4,7 @@ const request = require("request-promise");
 const CustomAjvError = require("../model/custom-ajv-error");
 
 class GraphRestriction {
-    constructor(olsBaseUrl, keywordName){
+    constructor(keywordName, olsBaseUrl){
         this.keywordName = keywordName ? keywordName : "graph_restriction";
         this.olsBaseUrl = olsBaseUrl;
     }

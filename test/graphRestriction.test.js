@@ -10,7 +10,7 @@ test(" -> graphRestriction 1 Schema", () => {
     let inputObj = fs.readFileSync("examples/objects/graphRestriction_pass.json");
     let jsonObj = JSON.parse(inputObj);
 
-    const ingestValidator = new ElixirValidator([GraphRestriction]);
+    const ingestValidator = new ElixirValidator([new GraphRestriction(null, "https://www.ebi.ac.uk/ols/api")]);
 
     return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
@@ -26,7 +26,7 @@ test(" -> graphRestriction 2 Schema", () => {
     let jsonObj = JSON.parse(inputObj);
 
 
-    const ingestValidator = new ElixirValidator([GraphRestriction]);
+    const ingestValidator = new ElixirValidator([new GraphRestriction(null, "https://www.ebi.ac.uk/ols/api")]);
 
     return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
@@ -41,12 +41,12 @@ test(" -> graphRestriction 3 Schema", () => {
     let jsonObj = JSON.parse(inputObj);
 
 
-    const ingestValidator = new ElixirValidator([GraphRestriction]);
+    const ingestValidator = new ElixirValidator([new GraphRestriction(null, "https://www.ebi.ac.uk/ols/api")]);
 
     return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(1);
-        expect(data.validationErrors[0].userFriendlyMessage).toContain('Provided term is not child of');
+        expect(data.length).toBe(1);
+        expect(data[0].message).toContain('Provided term is not child of');
 
     });
 });
