@@ -14,9 +14,8 @@ test("isChildTermOf", () => {
   const ingestValidator = new ElixirValidator([new IsChildTermOf(null, "https://www.ebi.ac.uk/ols/api/search?q=")]);
 
   return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
-        expect(data).toBeDefined();
-        expect(data.length).toBe(1);
-        expect(data[0].message).toContain('Provided term is not child of');
-
-    });
+    expect(data).toBeDefined();
+    expect(data.length).toBe(1);
+    expect(data[0].message).toContain('Provided term is not child of');
+  });
 });
