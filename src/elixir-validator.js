@@ -24,7 +24,7 @@ class ElixirValidator {
         this.customKeywordValidators = customKeywordValidators;
     }
 
-    validateSingleSchema(inputSchema, inputObject) {
+    validate(inputSchema, inputObject) {
         inputSchema["$async"] = true;
         const schemaId = inputSchema['$id'];
 
