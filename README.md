@@ -19,7 +19,7 @@ The validation is done using the [AJV](https://github.com/epoberezkin/ajv) libra
 
 ## Installation
 
-`npm install elixir-jsonschema validator`
+`npm install elixir-jsonschema-validator`
 
 ### Usage
 
