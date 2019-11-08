@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7" lang="en" dir="ltr"><![endif]-->
 <!--[if IE 7]><html class="lt-ie9 lt-ie8" lang="en" dir="ltr"><![endif]-->
@@ -210,40 +211,51 @@
             event.preventDefault();
         }).bind("click", function (e) {
 
-            var schema = JSON.parse($("#input").val());
-            var instance = JSON.parse($("#input2").val());
+            var schema;
+            var instance;
 
-            var submit = {
-                "schema" : schema,
-                "object" : instance
-            };
+            try {
+                schema = JSON.parse($("#input").val());
+                instance = JSON.parse($("#input2").val());
+            } catch (e) {
+                $("#valid").hide();
+                $("#failed").show();
+                $("#results").empty();
+            }
+
+            if (schema && instance) {
+
+                var submit = {
+                    "schema" : schema,
+                    "object" : instance
+                };
 
 
-            $.ajax({
-                type: "POST",
-                url: 'validate',
-                data: JSON.stringify(submit),
-                success: function (response) {
+                $.ajax({
+                    type: "POST",
+                    url: 'validate',
+                    data: JSON.stringify(submit),
+                    success: function (response) {
 
-                    if (response.validationState == "VALID") {
-                        $("#valid").show()
-                        $("#failed").hide()
-                    }
-                    else {
-                        $("#valid").hide()
-                        $("#failed").show()
-                        $('#results').append("<ul id='cList'></ul>");
-                        for (i = 0; i < response.validationErrors.length; i++) {
-                            $("#cList").append("<li><span style=\"colour: red;\">" +
-                                response.validationErrors[i].userFriendlyMessage + "</span></li>");
+                        if (response.validationState == "VALID") {
+                            $("#valid").show();
+                            $("#failed").hide();
+                            $("#results").empty();
                         }
+                        else {
+                            $("#valid").hide();
+                            $("#failed").show();
+                            $('#results').append("<ul id='cList'></ul>");
+                            for (i = 0; i < response.validationErrors.length; i++) {
+                                $("#cList").append("<li><span style=\"colour: red;\">" +
+                                    response.validationErrors[i].userFriendlyMessage + "</span></li>");
+                            }
 
-                    }
-                },
-                contentType: 'application/json'
-            });
-
-
+                        }
+                    },
+                    contentType: 'application/json'
+                });
+            }
         });
 
 
