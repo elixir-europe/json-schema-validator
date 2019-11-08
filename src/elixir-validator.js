@@ -26,13 +26,10 @@ class ElixirValidator {
 
     validate(inputSchema, inputObject) {
         inputSchema["$async"] = true;
-        const schemaId = inputSchema['$id'];
-
         return new Promise((resolve, reject) => {
             const compiledSchemaPromise = this.getValidationFunction(inputSchema);
 
             compiledSchemaPromise.then((validate) => {
-                this.validatorCache[schemaId] = validate;
                 Promise.resolve(validate(inputObject))
                     .then((data) => {
                             if (validate.errors) {
@@ -89,16 +86,16 @@ class ElixirValidator {
     }
 
     getValidationFunction(inputSchema) {
-        return ElixirValidator._getValidationFunction(inputSchema, this.validatorCache, this.ajvInstance);
-    }
-
-    static _getValidationFunction(inputSchema, validatorCache , ajv) {
         const schemaId = inputSchema['$id'];
 
-        if(validatorCache[schemaId]) {
-            return Promise.resolve(validatorCache[schemaId]);
+        if(this.validatorCache[schemaId]) {
+            return Promise.resolve(this.validatorCache[schemaId]);
         } else {
-            return Promise.resolve(ajv.compileAsync(inputSchema));
+            const compiledSchemaPromise = this.ajvInstance.compileAsync(inputSchema);
+            if(schemaId) {
+                this.validatorCache[schemaId] = compiledSchemaPromise;
+            }
+            return Promise.resolve(compiledSchemaPromise);
         }
     }
 
