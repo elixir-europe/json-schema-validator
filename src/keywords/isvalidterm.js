@@ -10,7 +10,7 @@ class IsValidTerm {
     }
 
     configure(ajv) {
-        const keywordDefinition= {
+        const keywordDefinition = {
             async: this.isAsync(),
             type: "string",
             validate: this.generateKeywordFunction(),

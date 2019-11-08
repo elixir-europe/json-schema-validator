@@ -9,7 +9,7 @@ test("isValidTerm", () => {
   let inputObj = fs.readFileSync("examples/objects/isValidTerm.json");
   let jsonObj = JSON.parse(inputObj);
 
-  const ingestValidator = new ElixirValidator([IsValidTerm]);
+  const ingestValidator = new ElixirValidator([new IsValidTerm(null, "")]);
 
   return ingestValidator.validate(jsonSchema, jsonObj).then((data) => {
         expect(data).toBeDefined();
