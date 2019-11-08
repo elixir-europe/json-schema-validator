@@ -6,7 +6,7 @@ test("HCA ref schema, species and restriction schema test very large schema no e
     let hcaSchemas = fs.readFileSync("examples/schemas/references/hca_donor_organism.json");
     let jsonHcaSchemas = JSON.parse(hcaSchemas);
 
-    const elixirValidator = new ElixirValidator();
+    const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(
         jsonHcaSchemas,
@@ -34,7 +34,7 @@ test("HCA ref schema, species and restriction schema test very large schema no e
             ]        }
     ).then( (data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(0);
+        expect(data.length).toBe(0);
     });
 });
 
@@ -42,7 +42,7 @@ test("HCA ref schema, species and restriction schema test very large schema no e
     let hcaSchemas = fs.readFileSync("examples/schemas/references/hca_donor_organism.json");
     let jsonHcaSchemas = JSON.parse(hcaSchemas);
 
-    const elixirValidator = new ElixirValidator();
+    const elixirValidator = new ElixirValidator([]);
 
     return elixirValidator.validate(
         jsonHcaSchemas,
@@ -69,8 +69,8 @@ test("HCA ref schema, species and restriction schema test very large schema no e
             ]        }
     ).then( (data) => {
         expect(data).toBeDefined();
-        expect(data.validationErrors.length).toBe(1);
-        expect(data.validationErrors[0].userFriendlyMessage).toContain("biomaterial_id")
+        expect(data.length).toBe(1);
+        expect(data[0].message).toContain("biomaterial_id")
     });
 });
 
