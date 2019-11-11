@@ -1,75 +1,81 @@
-const Ajv = require("ajv");
-const request = require("request");
-const logger = require("../winston");
-const CustomAjvError = require("../model/custom-ajv-error");
-
-class IsValidTerm {
-    constructor(keywordName, olsSearchUrl) {
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var ajv = __importStar(require("ajv"));
+var request_promise_1 = __importDefault(require("request-promise"));
+var winston_1 = __importDefault(require("../winston"));
+var IsValidTerm = /** @class */ (function () {
+    function IsValidTerm(olsSearchUrl, keywordName) {
         this.keywordName = keywordName ? keywordName : "isValidTerm";
         this.olsSearchUrl = olsSearchUrl;
     }
-
-    configure(ajv) {
-        const keywordDefinition = {
+    IsValidTerm.prototype.configure = function (ajv) {
+        var keywordDefinition = {
             async: this.isAsync(),
             type: "string",
             validate: this.generateKeywordFunction(),
             errors: true
         };
-
         return ajv.addKeyword(this.keywordName, keywordDefinition);
-    }
-
-    keywordFunction() {
+    };
+    IsValidTerm.prototype.keywordFunction = function () {
         return this.generateKeywordFunction();
-    }
-
-    isAsync() {
+    };
+    IsValidTerm.prototype.isAsync = function () {
         return true;
-    }
-
-    generateKeywordFunction() {
-        const findTerm = (schema, data) => {
-            return new Promise((resolve, reject) => {
+    };
+    IsValidTerm.prototype.generateKeywordFunction = function () {
+        var _this = this;
+        var generateErrorObject = function (message) {
+            return {
+                keyword: _this.keywordName,
+                message: message,
+                dataPath: "",
+                schemaPath: "",
+                params: {}
+            };
+        };
+        var findTerm = function (schema, data) {
+            return new Promise(function (resolve, reject) {
                 if (schema) {
-                    let errors = [];
-
-                    const termUri = data;
-                    const encodedTermUri = encodeURIComponent(termUri);
-                    const url = this.olsSearchUrl + encodedTermUri + "&exact=true&groupField=true&queryFields=iri";
-
-                    logger.log("debug", `Looking for term [${termUri}] in OLS.`);
-                    request(url, (error, Response, body) => {
-                        let jsonBody = JSON.parse(body);
-
+                    var errors_1 = [];
+                    var termUri_1 = data;
+                    var encodedTermUri = encodeURIComponent(termUri_1);
+                    var url = _this.olsSearchUrl + encodedTermUri + "&exact=true&groupField=true&queryFields=iri";
+                    winston_1.default.log("debug", "Looking for term [" + termUri_1 + "] in OLS.");
+                    request_promise_1.default(url, function (error, Response, body) {
+                        var jsonBody = JSON.parse(body);
                         if (jsonBody.response.numFound === 1) {
-                            logger.log("debug", "Found 1 match!");
+                            winston_1.default.log("debug", "Found 1 match!");
                             resolve(true);
-                        } else if (jsonBody.response.numFound === 0) {
-                            logger.log("debug", "Could not find term in OLS.");
-                            errors.push(
-                                new CustomAjvError(
-                                    "isValidTerm", `provided term does not exist in OLS: [${termUri}]`,
-                                    {keyword: "isValidTerm"})
-                            );
-                            reject(new Ajv.ValidationError(errors));
-                        } else {
-                            errors.push(
-                                new CustomAjvError(
-                                    "isValidTerm", "Something went wrong while validating term, try again.",
-                                    {keyword: "isValidTerm"})
-                            );
-                            reject(new Ajv.ValidationError(errors));
+                        }
+                        else if (jsonBody.response.numFound === 0) {
+                            winston_1.default.log("debug", "Could not find term in OLS.");
+                            errors_1.push(generateErrorObject("provided term does not exist in OLS: [" + termUri_1 + "]", { keyword: "isValidTerm" }));
+                            reject(new ajv.ValidationError(errors_1));
+                        }
+                        else {
+                            errors_1.push(generateErrorObject("Something went wrong while validating term, try again.", { keyword: "isValidTerm" }));
+                            reject(new ajv.ValidationError(errors_1));
                         }
                     });
-                } else {
+                }
+                else {
                     resolve(true);
                 }
             });
         };
-
         return findTerm;
-    }
-}
-
-module.exports = IsValidTerm;
+    };
+    return IsValidTerm;
+}());
+exports.default = IsValidTerm;

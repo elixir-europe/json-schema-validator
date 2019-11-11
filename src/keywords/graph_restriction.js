@@ -1,126 +1,121 @@
-const CurieExpansion = require("../utils/curie_expansion");
-const ajv = require("ajv");
-const request = require("request-promise");
-const CustomAjvError = require("../model/custom-ajv-error");
-
-class GraphRestriction {
-    constructor(keywordName, olsBaseUrl){
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var curie_expansion_1 = __importDefault(require("../utils/curie_expansion"));
+var ajv_1 = __importDefault(require("ajv"));
+var request_promise_1 = __importDefault(require("request-promise"));
+var bluebird_1 = __importDefault(require("bluebird"));
+var GraphRestriction = /** @class */ (function () {
+    function GraphRestriction(olsBaseUrl, keywordName) {
         this.keywordName = keywordName ? keywordName : "graph_restriction";
         this.olsBaseUrl = olsBaseUrl;
     }
-
     /**
      *
      * Given an AJV validator, returns the validator with the graph-restriction keyword applied
      *
      * @param ajv
      */
-    configure(ajv) {
-        const keywordDefinition= {
+    GraphRestriction.prototype.configure = function (ajv) {
+        var keywordDefinition = {
             async: GraphRestriction._isAsync(),
             type: "string",
             validate: this.generateKeywordFunction(),
             errors: true
         };
-
         return ajv.addKeyword(this.keywordName, keywordDefinition);
-    }
-
-    keywordFunction() {
+    };
+    GraphRestriction.prototype.keywordFunction = function () {
         return this.generateKeywordFunction();
-    }
-
-    isAsync() {
+    };
+    GraphRestriction.prototype.isAsync = function () {
         return GraphRestriction._isAsync();
-    }
-
-    static _isAsync() {
+    };
+    GraphRestriction._isAsync = function () {
         return true;
-    }
-
-    generateKeywordFunction() {
-
-        const olsSearchUrl = `${this.olsBaseUrl}/search?q=`;
-        const cachedOlsResponses = {};
-        const curieExpansion = new CurieExpansion(olsSearchUrl);
-
-        const callCurieExpansion = (terms) => {
-            let expanded = terms.map((t) => {
-                if (CurieExpansion.isCurie(t)){
+    };
+    GraphRestriction.prototype.generateKeywordFunction = function () {
+        var _this = this;
+        var olsSearchUrl = this.olsBaseUrl + "/search?q=";
+        var cachedOlsResponses = {};
+        var curieExpansion = new curie_expansion_1.default(olsSearchUrl);
+        var callCurieExpansion = function (terms) {
+            var expanded = terms.map(function (t) {
+                if (curie_expansion_1.default.isCurie(t)) {
                     return curieExpansion.expandCurie(t);
                 }
                 else {
-                    return t
+                    return t;
                 }
             });
-
-            return Promise.all(expanded);
+            return bluebird_1.default.all(expanded);
         };
-
-        const generateErrorObject = (message) => {
-            return new CustomAjvError("graph_restriction", message, {});
+        var generateErrorObject = function (message) {
+            return {
+                keyword: _this.keywordName,
+                message: message,
+                dataPath: "",
+                schemaPath: "",
+                params: {}
+            };
         };
-
-        const findChildTerm = (schema, data) => {
-            return new Promise((resolve, reject) => {
-                let parentTerms = schema.classes;
-                const ontologyIds = schema.ontologies;
-                let errors = [];
-
-                if(parentTerms && ontologyIds) {
-                    if(schema.include_self === true && parentTerms.includes(data)){
+        var findChildTerm = function (schema, data) {
+            return new bluebird_1.default(function (resolve, reject) {
+                var parentTerms = schema.classes;
+                var ontologyIds = schema.ontologies;
+                var errors = [];
+                if (parentTerms && ontologyIds) {
+                    if (schema.include_self === true && parentTerms.includes(data)) {
                         resolve(data);
                     }
                     else {
-                        callCurieExpansion(parentTerms).then((iris) => {
-
-                            const parentTerm = iris.join(",");
-                            const ontologyId = ontologyIds.join(",").replace(/obo:/g, "");
-
-                            const termUri = encodeURIComponent(data);
-                            const url = olsSearchUrl + termUri
+                        callCurieExpansion(parentTerms).then(function (iris) {
+                            var parentTerm = iris.join(",");
+                            var ontologyId = ontologyIds.join(",").replace(/obo:/g, "");
+                            var termUri = encodeURIComponent(data);
+                            var url = olsSearchUrl + termUri
                                 + "&exact=true&groupField=true&allChildrenOf=" + encodeURIComponent(parentTerm)
                                 + "&ontology=" + ontologyId + "&queryFields=obo_id";
-
-                            let olsResponsePromise = null;
-                            if(cachedOlsResponses[url]) {
-                                olsResponsePromise = Promise.resolve(cachedOlsResponses[url]);
+                            var olsResponsePromise;
+                            if (cachedOlsResponses[url]) {
+                                olsResponsePromise = bluebird_1.default.resolve(cachedOlsResponses[url]);
                             }
                             else {
-                                olsResponsePromise = request({
+                                olsResponsePromise = bluebird_1.default.resolve(request_promise_1.default({
                                     method: "GET",
                                     url: url,
                                     json: true
-                                });
+                                }));
                             }
-
-                            olsResponsePromise.then((resp) => {
+                            olsResponsePromise.then(function (resp) {
                                 cachedOlsResponses[url] = resp;
-                                let jsonBody = resp;
-
+                                var jsonBody = resp;
                                 if (jsonBody.response.numFound === 1) {
-                                } else if (jsonBody.response.numFound === 0) {
-                                    errors.push(generateErrorObject(`Provided term is not child of [${parentTerm}]`));
-                                } else {
+                                }
+                                else if (jsonBody.response.numFound === 0) {
+                                    errors.push(generateErrorObject("Provided term is not child of [" + parentTerm + "]"));
+                                }
+                                else {
                                     errors.push(generateErrorObject("Something went wrong while validating term, try again."));
                                 }
-                                reject(new ajv.ValidationError(errors));
+                                reject(new ajv_1.default.ValidationError(errors));
                             });
-                        }).catch(err => {
+                        }).catch(function (err) {
                             errors.push(generateErrorObject(err));
-                            reject(new ajv.ValidationError(errors));
+                            reject(new ajv_1.default.ValidationError(errors));
                         });
                     }
                 }
                 else {
                     errors.push(generateErrorObject("Missing required variable in schema graph_restriction, required properties are: parentTerm and ontologyId."));
-                    reject(ajv.ValidationError);
+                    reject(ajv_1.default.ValidationError);
                 }
             });
         };
-
         return findChildTerm;
-    }
-}
-
-module.exports = GraphRestriction;
+    };
+    return GraphRestriction;
+}());
+exports.default = GraphRestriction;

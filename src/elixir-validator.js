@@ -1,158 +1,154 @@
+"use strict";
 /**
  * Created by rolando on 08/08/2018.
  */
-
-const Promise = require('bluebird');
-const path = require("path");
-const fs = require('fs');
-const ajv = require("ajv");
-const request = require("request-promise");
-const AppError = require("./model/application-error");
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var bluebird_1 = __importDefault(require("bluebird"));
+var path_1 = __importDefault(require("path"));
+var fs_1 = __importDefault(require("fs"));
+var ajv_1 = __importDefault(require("ajv"));
+var request_promise_1 = __importDefault(require("request-promise"));
+var application_error_1 = __importDefault(require("./model/application-error"));
 /**
  *
  * Wraps the generic validator, outputs errors in custom format.
  *
  */
-
-class ElixirValidator {
-    constructor(customKeywordValidators, baseSchemaPath){
+var ElixirValidator = /** @class */ (function () {
+    function ElixirValidator(customKeywordValidators, baseSchemaPath) {
+        this.cachedSchemas = {};
         this.validatorCache = {};
         this.cachedSchemas = {};
         this.ajvInstance = this.constructAjv(customKeywordValidators);
         this.baseSchemaPath = baseSchemaPath;
         this.customKeywordValidators = customKeywordValidators;
     }
-
-    validate(inputSchema, inputObject) {
+    ElixirValidator.prototype.validate = function (inputSchema, inputObject) {
+        var _this = this;
         inputSchema["$async"] = true;
-        return new Promise((resolve, reject) => {
-            const compiledSchemaPromise = this.getValidationFunction(inputSchema);
-
-            compiledSchemaPromise.then((validate) => {
-                Promise.resolve(validate(inputObject))
-                    .then((data) => {
-                            if (validate.errors) {
-                                resolve(validate.errors);
-                            } else {
-                                resolve([]);
-                            }
-                        }
-                    ).catch((err) => {
-                    if (!(err instanceof ajv.ValidationError)) {
+        return new bluebird_1.default(function (resolve, reject) {
+            var compiledSchemaPromise = _this.getValidationFunction(inputSchema);
+            compiledSchemaPromise.then(function (validate) {
+                bluebird_1.default.resolve(validate(inputObject))
+                    .then(function (data) {
+                    if (validate.errors) {
+                        resolve(validate.errors);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                }).catch(function (err) {
+                    if (!(err instanceof ajv_1.default.ValidationError)) {
                         console.error("An error occurred while running the validation.");
-                        reject(new AppError("An error occurred while running the validation."));
-                    } else {
-                        console.debug("debug", this.ajvInstance.errorsText(err.errors, {dataVar: inputObject.alias}));
+                        reject(new application_error_1.default("An error occurred while running the validation."));
+                    }
+                    else {
+                        console.debug("debug", _this.ajvInstance.errorsText(err.errors, { dataVar: inputObject["alias"] }));
                         resolve(err.errors);
                     }
                 });
-            }).catch((err) => {
+            }).catch(function (err) {
                 console.error("async schema compiled encountered and error");
                 console.error(err.stack);
                 reject(err);
             });
         });
-    }
-
-    validateWithRemoteSchema(schemaUri, document) {
+    };
+    ElixirValidator.prototype.validateWithRemoteSchema = function (schemaUri, document) {
+        var _this = this;
         return this.getSchema(schemaUri)
-            .then(schema => {return this.validateSingleSchema(document, schema)})
-    }
-
-    getSchema(schemaUri) {
-        if(! this.cachedSchemas[schemaUri]) {
-            return new Promise((resolve, reject) => {
+            .then(function (schema) { return _this.validate(document, schema); });
+    };
+    ElixirValidator.prototype.getSchema = function (schemaUri) {
+        var _this = this;
+        if (!this.cachedSchemas[schemaUri]) {
+            return new bluebird_1.default(function (resolve, reject) {
                 ElixirValidator.fetchSchema(schemaUri)
-                    .then(schema => {
-                        this.cachedSchemas[schemaUri] = schema;
-                        resolve(schema);
-                    })
-                    .catch(err => {
-                        reject(err);
-                    })
+                    .then(function (schema) {
+                    _this.cachedSchemas[schemaUri] = schema;
+                    resolve(schema);
+                })
+                    .catch(function (err) {
+                    reject(err);
+                });
             });
-        } else {
-            return Promise.resolve(this.cachedSchemas[schemaUri]);
         }
-    }
-
-    static fetchSchema(schemaUrl) {
-        return request({
+        else {
+            return bluebird_1.default.resolve(this.cachedSchemas[schemaUri]);
+        }
+    };
+    ElixirValidator.fetchSchema = function (schemaUrl) {
+        return bluebird_1.default.resolve(request_promise_1.default({
             method: "GET",
             url: schemaUrl,
             json: true,
-        });
-    }
-
-    getValidationFunction(inputSchema) {
-        const schemaId = inputSchema['$id'];
-
-        if(this.validatorCache[schemaId]) {
-            return Promise.resolve(this.validatorCache[schemaId]);
-        } else {
-            const compiledSchemaPromise = this.ajvInstance.compileAsync(inputSchema);
-            if(schemaId) {
+        }));
+    };
+    ElixirValidator.prototype.getValidationFunction = function (inputSchema) {
+        var schemaId = inputSchema['$id'];
+        if (this.validatorCache[schemaId]) {
+            return bluebird_1.default.resolve(this.validatorCache[schemaId]);
+        }
+        else {
+            var compiledSchemaPromise = bluebird_1.default.resolve(this.ajvInstance.compileAsync(inputSchema));
+            if (schemaId) {
                 this.validatorCache[schemaId] = compiledSchemaPromise;
             }
-            return Promise.resolve(compiledSchemaPromise);
+            return bluebird_1.default.resolve(compiledSchemaPromise);
         }
-    }
-
-    constructAjv(customKeywordValidators) {
-        const ajvInstance = new ajv({allErrors: true, schemaId: 'id', loadSchema: this.generateLoadSchemaRefFn()});
+    };
+    ElixirValidator.prototype.constructAjv = function (customKeywordValidators) {
+        var ajvInstance = new ajv_1.default({ allErrors: true, schemaId: 'id', loadSchema: this.generateLoadSchemaRefFn() });
         ajvInstance.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
         ElixirValidator._addCustomKeywordValidators(ajvInstance, customKeywordValidators);
-
-        return ajvInstance
-    }
-
-    static _addCustomKeywordValidators(ajvInstance, customKeywordValidators) {
-        customKeywordValidators.forEach(customKeywordValidator => {
+        return ajvInstance;
+    };
+    ElixirValidator._addCustomKeywordValidators = function (ajvInstance, customKeywordValidators) {
+        customKeywordValidators.forEach(function (customKeywordValidator) {
             ajvInstance = customKeywordValidator.configure(ajvInstance);
         });
-
         return ajvInstance;
-    }
-
-    generateLoadSchemaRefFn() {
-        const cachedSchemas = this.cachedSchemas;
-        const baseSchemaPath = this.baseSchemaPath;
-
-        const loadSchemaRefFn = (uri) => {
-            if(cachedSchemas[uri]) {
-                return Promise.resolve(cachedSchemas[uri]);
-            } else {
+    };
+    ElixirValidator.prototype.generateLoadSchemaRefFn = function () {
+        var cachedSchemas = this.cachedSchemas;
+        var baseSchemaPath = this.baseSchemaPath;
+        var loadSchemaRefFn = function (uri) {
+            if (cachedSchemas[uri]) {
+                return bluebird_1.default.resolve(cachedSchemas[uri]);
+            }
+            else {
                 if (baseSchemaPath) {
-                    let ref = path.join(baseSchemaPath, uri);
+                    var ref = path_1.default.join(baseSchemaPath, uri);
                     console.log('loading ref ' + ref);
-                    let jsonSchema = fs.readFileSync(ref);
-                    let loadedSchema = JSON.parse(jsonSchema);
+                    var jsonSchema = fs_1.default.readFileSync(ref);
+                    var loadedSchema = JSON.parse(jsonSchema.toString());
                     loadedSchema["$async"] = true;
                     cachedSchemas[uri] = loadedSchema;
-                    return Promise.resolve(loadedSchema);
+                    return bluebird_1.default.resolve(loadedSchema);
                 }
                 else {
-                    return new Promise((resolve, reject) => {
-                        request({
+                    return new bluebird_1.default(function (resolve, reject) {
+                        request_promise_1.default({
                             method: "GET",
                             url: uri,
                             json: true
-                        }).then(resp => {
-                            const loadedSchema = resp;
+                        }).then(function (resp) {
+                            var loadedSchema = resp;
                             loadedSchema["$async"] = true;
                             cachedSchemas[uri] = loadedSchema;
                             resolve(loadedSchema);
-                        }).catch(err => {
+                        }).catch(function (err) {
                             reject(err);
                         });
                     });
                 }
             }
         };
-
         return loadSchemaRefFn;
-    }
-}
-
-module.exports = ElixirValidator;
+    };
+    return ElixirValidator;
+}());
+exports.default = ElixirValidator;
