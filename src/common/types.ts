@@ -1,5 +1,3 @@
-import {Ajv, ErrorObject} from "ajv";
-
 namespace ts {
 
 }
