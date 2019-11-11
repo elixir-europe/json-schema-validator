@@ -2,7 +2,8 @@
   "name": "elixir-jsonschema-validator",
   "version": "1.4.2",
   "description": "Custom JSON-Schema keywords for Ajv validator and validation service with API",
-  "main": "index.js",
+  "main": "src/index.ts",
+  "types": "src/index.d.ts",
   "repository": "https://github.com/elixir-europe/json-schema-validator.git",
   "scripts": {
     "build": "tsc --skipLibCheck",
