@@ -1,55 +1,53 @@
-let request = require("request-promise");
-const logger = require("../winston");
+const request = require("request-promise");
+const Promise = require("bluebird");
 
-const cachedOlsCurieResponses = {};
+class CurieExpansion {
+    constructor(olsSearchUrl){
+        this.olsSearchUrl = olsSearchUrl;
+        this.cachedOlsCurieResponses = {};
+    }
 
-module.exports = {
-
-    isCurie: function(term){
+    static isCurie(term) {
         let curie = true;
-        if (term.split(":").length != 2 || term.includes("http")){
-                curie = false;
+        if (term.split(":").length !== 2 || term.includes("http")){
+            curie = false;
         }
         return curie;
-    },
+    }
 
-    expandCurie: function(term, olsApi){
-
-        if (!olsApi)
-            olsApi = "https://www.ebi.ac.uk/ols/api";
-
+    expandCurie(term) {
         const termUri = encodeURIComponent(term);
-        const url = olsApi + '/search?q=' + termUri
+        const url = this.olsSearchUrl + termUri
             + "&exact=true&groupField=true&queryFields=obo_id";
 
         return new Promise((resolve, reject) => {
             let curieExpandResponsePromise = null;
 
-            if(cachedOlsCurieResponses[url]) {
-                curieExpandResponsePromise = Promise.resolve(cachedOlsCurieResponses[url]);
+            if(this.cachedOlsCurieResponses[url]) {
+                curieExpandResponsePromise = Promise.resolve(this.cachedOlsCurieResponses[url]);
             } else {
                 curieExpandResponsePromise = request({
                     method: "GET",
                     url: url,
                     json: true
-                })
+                }).promise();
             }
 
             curieExpandResponsePromise
-                .then(resp => {
-                    cachedOlsCurieResponses[url] = resp;
+                .then((resp) => {
+                    this.cachedOlsCurieResponses[url] = resp;
                     let jsonBody = resp;
                     if (jsonBody.response.numFound === 1) {
-                        logger.log("debug", "Term found");
                         resolve(jsonBody.response.docs[0].iri);
                     }
                     else {
                         reject("Could not retrieve IRI for " + term);
                     }
                 }).catch(err => {
-                    reject(err)
-                });
+                reject(err)
+            });
         });
-
     }
-};
+}
+
+module.exports = CurieExpansion;
