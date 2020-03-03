@@ -237,7 +237,7 @@
                     data: JSON.stringify(submit),
                     success: function (response) {
 
-                        if (response.validationState == "VALID") {
+                        if (response.length === 0) {
                             $("#valid").show();
                             $("#failed").hide();
                             $("#results").empty();
@@ -246,9 +246,9 @@
                             $("#valid").hide();
                             $("#failed").show();
                             $('#results').append("<ul id='cList'></ul>");
-                            for (i = 0; i < response.validationErrors.length; i++) {
+                            for (i = 0; i < response.length; i++) {
                                 $("#cList").append("<li><span style=\"colour: red;\">" +
-                                    response.validationErrors[i].userFriendlyMessage + "</span></li>");
+                                    response[i].message + "</span></li>");
                             }
 
                         }
