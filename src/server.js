@@ -15,7 +15,11 @@ const npid = require("npid");
 
 const app = express();
 const port = process.env.PORT || 3020;
-const elixirValidator = new ElixirValidator([GraphRestriction, IsChildTermOf, IsValidTerm]);
+const elixirValidator = new ElixirValidator([
+  new GraphRestriction(null, "https://www.ebi.ac.uk/ols/api/search?q="),
+  new IsChildTermOf(null, "https://www.ebi.ac.uk/ols/api/search?q="),
+  new IsValidTerm(null, "https://www.ebi.ac.uk/ols/api/search?q=")
+]);
 
 app.use(express.static('src/views'));
 
