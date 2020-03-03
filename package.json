@@ -20,7 +20,7 @@
     "schema",
     "validator"
   ],
-  "author": "EMBL-EBI-SUBS, fpenim, rolando-ebi, simonjupp",
+  "author": "EMBL-EBI-SUBS, fpenim, rolando-ebi, simonjupp, haseeb-gh",
   "license": "Apache-2.0",
   "dependencies": {
     "ajv": "^6.10.2",
