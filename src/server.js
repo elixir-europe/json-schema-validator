@@ -8,14 +8,15 @@ const path = require('path')
 let ElixirValidator  = require('./elixir-validator');
 let GraphRestriction = require('./keywords/graph_restriction');
 let IsChildTermOf = require('./keywords/ischildtermof');
-let IsValidTerm = require('./keywords/isvalidterm');
+let IsValidTaxonomy = require('./keywords/isvalidtaxonomy');
+
 
 const argv = require("yargs").argv;
 const npid = require("npid");
 
 const app = express();
 const port = process.env.PORT || 3020;
-const elixirValidator = new ElixirValidator([GraphRestriction, IsChildTermOf, IsValidTerm]);
+const elixirValidator = new ElixirValidator([GraphRestriction, IsChildTermOf, IsValidTerm, IsValidTaxonomy]);
 
 app.use(express.static('src/views'));
 

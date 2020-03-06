@@ -161,6 +161,38 @@ JSON object:
 }
 ```
 
+### isvalidTaxonomy
+
+This custom keyword evaluates if a given *taxonomy* exists in ENA's Taxonomy Browser. It is applied to a string (url) and **passes validation if the taxonomy exists in OLS**. It can be aplied to any string defined in the schema.
+
+This keyword works by doing an asynchronous call to the [OLS API](https://www.ebi.ac.uk/ena/taxonomy/rest/any-name/) that will respond with the required information to determine if the term exists or not.
+Being an async validation step, whenever used, the schema must have the flag: `"$async": true` in it's object root.
+
+#### Usage
+Schema:
+```js
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Is valid taxonomy expression.",
+  "$async": true,
+  
+  "properties": {
+    "value": { 
+      "type": "string", 
+      "minLength": 1, 
+      "isValidTaxonomy": true
+    }
+  }
+}
+```
+JSON object:
+```js
+{
+  "metagenomic source" : [ {
+    "value" : "wastewater metagenome"
+  } ]
+}
+```
 
 ## Validation API
 This validator exposes two endpoints that will accept POST requests: `/validate` for a single stand-alone schema and data object, and `/validateRefs` for a complex schema referencing other schemas and a related data object.
