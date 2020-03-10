@@ -163,9 +163,9 @@ JSON object:
 
 ### isvalidTaxonomy
 
-This custom keyword evaluates if a given *taxonomy* exists in ENA's Taxonomy Browser. It is applied to a string (url) and **passes validation if the taxonomy exists in OLS**. It can be aplied to any string defined in the schema.
+This custom keyword evaluates if a given *taxonomy* exists in ENA's Taxonomy Browser. It is applied to a string (url) and **passes validation if the taxonomy exists in ENA**. It can be aplied to any string defined in the schema.
 
-This keyword works by doing an asynchronous call to the [OLS API](https://www.ebi.ac.uk/ena/taxonomy/rest/any-name/) that will respond with the required information to determine if the term exists or not.
+This keyword works by doing an asynchronous call to the [ENA API](https://www.ebi.ac.uk/ena/taxonomy/rest/any-name/) that will respond with the required information to determine if the term exists or not.
 Being an async validation step, whenever used, the schema must have the flag: `"$async": true` in it's object root.
 
 #### Usage
