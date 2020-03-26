@@ -109,7 +109,7 @@ class ElixirValidator {
 
     static _addCustomKeywordValidators(ajvInstance, customKeywordValidators) {
         customKeywordValidators.forEach(customKeywordValidator => {
-            ajvInstance = customKeywordValidator.configure(ajvInstance);
+            ajvInstance = new customKeywordValidator().configure(ajvInstance);
         });
 
         return ajvInstance;

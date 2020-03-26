@@ -9,7 +9,7 @@ let ElixirValidator  = require('./elixir-validator');
 let GraphRestriction = require('./keywords/graph_restriction');
 let IsChildTermOf = require('./keywords/ischildtermof');
 let IsValidTaxonomy = require('./keywords/isvalidtaxonomy');
-
+let IsValidTerm = require('./keywords/IsValidTerm');
 
 const argv = require("yargs").argv;
 const npid = require("npid");
