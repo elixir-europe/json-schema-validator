@@ -12,7 +12,7 @@ pullapprove_conditions:
 notifications:
 - when: pull_request.opened
   comment: |
-    Please @lauraclarke @mcortet @Clairerye assess this PR and contact the proper people.
+    Please @lauraclarke @mcourtot @clairerye assess this PR and contact the proper people.
 - when: pull_request.opened
   if: "base.ref != 'dev'"
   comment: |
