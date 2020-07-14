@@ -1,0 +1,20 @@
+version: 3
+
+# The following line breaks the yml - 404 page not found error
+# extends: https://api.github.com/repos/example/pullapprove-config/contents/.pullapprove.yml
+
+# If this conditions are not met, it will throw the 'unmet_status'.
+pullapprove_conditions:
+- condition: "'*travis*' in statuses.successful"
+  unmet_status: failure
+  explanation: "Travis CI tests must pass before review starts"
+
+notifications:
+- when: pull_request.opened
+  comment: |
+    Please @lauraclarke @mcortet @Clairerye assess this PR and contact the proper people.
+- when: pull_request.opened
+  if: "base.ref != 'dev'"
+  comment: |
+    @{{ author }}, please make sure the PR was created against the 'dev' branch. No PR must be merged directly into
+    master unless specified by the admin of the repository.
