@@ -1,6 +1,6 @@
 {
   "name": "elixir-jsonschema-validator",
-  "version": "1.6.1",
+  "version": "2.0.0",
   "description": "Custom JSON-Schema keywords for Ajv validator and validation service with API",
   "main": "index.js",
   "repository": "https://github.com/elixir-europe/json-schema-validator.git",
@@ -24,24 +24,11 @@
   "license": "Apache-2.0",
   "dependencies": {
     "ajv": "^6.10.2",
-    "amqplib": "^0.5.5",
     "bluebird": "^3.5.1",
-    "dnscache": "^1.0.2",
-    "express": "^4.17.1",
-    "express-validator": "^6.2.0",
-    "fs": "0.0.1-security",
-    "md5": "^2.2.1",
-    "npid": "^0.4.0",
-    "path": "^0.12.7",
-    "rambda": "^1.2.0",
-    "request": "^2.83.0",
-    "request-defaults": "^1.2.0",
     "request-promise": "^4.2.4",
     "winston": "^3.0.0-rc6",
     "winston-daily-rotate-file": "^3.2.1",
-    "yargs": "^11.0.0",
-    "event-stream": "=3.3.4",
-    "set-value": "^v3.0.1"
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
     "jest": "24.9.0",
