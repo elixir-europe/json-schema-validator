@@ -2,18 +2,19 @@
 [![Build Status](https://travis-ci.org/EMBL-EBI-SUBS/json-schema-validator.svg?branch=master)](https://travis-ci.org/EMBL-EBI-SUBS/json-schema-validator)
 [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 
-This repository contains a [JSON Schema](http://json-schema.org/) that includes custom extensions of life science data. This package can be used directly or set to run as a node server that receives validation requests and gives back results.
+This repository contains a [JSON Schema](http://json-schema.org/) validator that includes custom extensions of life science data.
+This package contains only a library for schema validation. You can use it as a dependency to set up and run it as a [Node.js](https://nodejs.org/en/) server that receives validation requests and gives back results.
 The validation is done using the [AJV](https://github.com/epoberezkin/ajv) library version ^6.0.0 that fully supports the JSON Schema **draft-07**.
 
 
 ## Contents
-- [Installation](README.md#install)
+- [Installation](README.md#installation)
+
+- [Usage](README.md#usage)
 
 - [Custom keywords](README.md#custom-keywords)
 
-- [Running locally](README.md#running-locally)
-
-- [Validation API](README.md#validation-api)
+- [Existing usage of this library](README.md#existing-usage-of-this-library)
 
 - [License](README.md#license)
 
@@ -49,13 +50,13 @@ validator.validate(jsonSchema, jsonObj).then((validationResult) => {
 
 ## Custom keywords
 The AJV library supports the implementation of custom json schema keywords to address validation scenarios that go beyond what json schema can handle.
-This validator has three custom keywords implemented, `graph_restriction`, `isChildTermOf` and `isValidTerm`.
+This validator has four custom keywords implemented: `graph_restriction`, `isChildTermOf`, `isValidTerm` and `isValidTaxonomy`.
 
 Pick the custom keywords you want to support and add them to the Elixir validator:
 
 ```js
 // get all the custom extensions
-let { ElixirValidator, GraphRestriction, IsChildTermOf, IsValidTerm]} = require('elixir-jsonschema-validator');
+let { ElixirValidator, GraphRestriction, IsChildTermOf, IsValidTerm, isValidTaxonomy]} = require('elixir-jsonschema-validator');
 // only use the graph_extension keyword
 let validator = new ElixirValidator([GraphRestriction])
 ```
@@ -67,7 +68,7 @@ This custom keyword *evaluates if an ontology term is child of another*. This ke
 The keyword requires one or more **parent terms** *(classes)* and **ontology ids** *(ontologies)*, both of which should exist in [OLS - Ontology Lookup Service](https://www.ebi.ac.uk/ols).
 
 This keyword works by doing an asynchronous call to the [OLS API](https://www.ebi.ac.uk/ols/api/) that will respond with the required information to know if a given term is child of another.
-Being an async validation step, whenever used is a schema, the schema must have the flag: `"$async": true` in it's object root.
+Being an async validation step, whenever used in a schema, the schema must have the flag: `"$async": true` in its object root.
 
 
 #### Usage
@@ -105,7 +106,7 @@ This custom keyword also *evaluates if an ontology term is child of another* and
 The keyword requires the **parent term** and the **ontology id**, both of which should exist in [OLS - Ontology Lookup Service](https://www.ebi.ac.uk/ols).
 
 This keyword works by doing an asynchronous call to the [OLS API](https://www.ebi.ac.uk/ols/api/) that will respond with the required information to know if a given term is child of another.
-Being an async validation step, whenever used is a schema, the schema must have the flag: `"$async": true` in it's object root.
+Being an async validation step, whenever used in a schema, the schema must have the flag: `"$async": true` in its object root.
 
 #### Usage
 Schema:
@@ -136,7 +137,7 @@ JSON object:
 This custom keyword *evaluates if a given ontology term url exists in OLS* ([Ontology Lookup Service](https://www.ebi.ac.uk/ols)). It is applied to a string (url) and **passes validation if the term exists in OLS**. It can be aplied to any string defined in the schema.
 
 This keyword works by doing an asynchronous call to the [OLS API](https://www.ebi.ac.uk/ols/api/) that will respond with the required information to determine if the term exists in OLS or not.
-Being an async validation step, whenever used is a schema, the schema must have the flag: `"$async": true` in it's object root.
+Being an async validation step, whenever used in a schema, the schema must have the flag: `"$async": true` in its object root.
 
 #### Usage
 Schema:
@@ -161,12 +162,12 @@ JSON object:
 }
 ```
 
-### isvalidTaxonomy
+### isValidTaxonomy
 
 This custom keyword evaluates if a given *taxonomy* exists in ENA's Taxonomy Browser. It is applied to a string (url) and **passes validation if the taxonomy exists in ENA**. It can be aplied to any string defined in the schema.
 
-This keyword works by doing an asynchronous call to the [ENA API](https://www.ebi.ac.uk/ena/taxonomy/rest/any-name/) that will respond with the required information to determine if the term exists or not.
-Being an async validation step, whenever used, the schema must have the flag: `"$async": true` in it's object root.
+This keyword works by doing an asynchronous call to the [ENA API](https://www.ebi.ac.uk/ena/taxonomy/rest/any-name/<REPLACE_ME_WITH_AXONOMY_TERM>) that will respond with the required information to determine if the term exists or not.
+Being an async validation step, whenever used in a schema, the schema must have the flag: `"$async": true` in its object root.
 
 #### Usage
 Schema:
@@ -194,190 +195,15 @@ JSON object:
 }
 ```
 
-## Validation API
-This validator exposes two endpoints that will accept POST requests: `/validate` for a single stand-alone schema and data object, and `/validateRefs` for a complex schema referencing other schemas and a related data object.
 
-### /validate
-The endpoint will expect the body to have the following structure:
-```js
-{
-  "schema": {},
-  "object": {}
-}
-```
-Where the schema should be a valid json schema to validate the object against.
+## Existing usage of this library
+You can see how to use this library in this GitHub repository: 
+[JSON Schema Validator service](https://github.com/EMBL-EBI-SUBS/json-schema-validator).
+Please follow the [Geting Started](https://github.com/EMBL-EBI-SUBS/json-schema-validator#getting-started) section 
+of that repository to set up and execute your own running instance of that validator service into your machine.
 
-**Example:** 
-```js
-{
-  "schema": {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    
-    "type": "object",
-    "properties": {
-      "alias": {
-        "description": "A sample unique identifier in a submission.",
-        "type": "string"
-      },
-      "taxonId": {
-        "description": "The taxonomy id for the sample species.",
-        "type": "integer"
-      },
-      "taxon": {
-        "description": "The taxonomy name for the sample species.",
-        "type": "string"
-      },
-      "releaseDate": {
-        "description": "Date from which this sample is released publicly.",
-        "type": "string",
-        "format": "date"
-      }
-    },  
-    "required": ["alias", "taxonId" ]
-  },
-  "object": {
-    "alias": "MA456",
-    "taxonId": 9606
-  }
-}
-```
-
-### Output
-
-Response with no validation errors:
-
-HTTP status code `200`
-```js
-[]
-```
-An example of a validation response with errors:
-
-HTTP status code `200`
-```js
-[
-  {
-    "errors": [
-        "should have required property 'value'"
-    ],
-    "dataPath": ".attributes['age'][0].value"
-  },
-  {
-    "errors": [
-        "should NOT be shorter than 1 characters",
-        "should match format \"uri\""
-    ],
-    "dataPath": ".attributes['breed'][0].terms[0].url"
-  }
-]
-```
-Where *errors* is an array of error messages for a given input identified by its path on *dataPath*. There may be one or more error objects within the response array. An empty array represents a valid validation result.
-
-### API Errors
-Sending malformed JSON or a body with either the schema or the submittable missing will result in an API error (the request will not reach the validation). 
-
-- When sending malformed JSON:
-
-  HTTP status code `400` - Bad Request
-  ```js
-  {
-    "errors": "Malformed JSON please check your request body."
-  }
-  ```
-- When any of the required body values is missing:
-
-  HTTP status code `422` - Unprocessable Entity
-  ```js
-  {
-    "errors": {
-      "schema": {
-        "location": "body",
-        "param": "schema",
-        "msg": "Required."
-      },
-      "object": {
-        "location": "body",
-        "param": "object",
-        "msg": "Required."
-      }
-    }
-  }
-  ```
-
-
-## Running locally
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-To be able to run this project you'll need to have [Node.js](https://nodejs.org/en/about/) and [npm](https://www.npmjs.com/) installed in your machine.
-npm is distributed with Node.js which means that when you download Node.js, you automatically get npm installed on your computer.
-
-### Installing
-
-#### Node.js / npm
-- Get Node.js: https://nodejs.org/en/ (v8.11.1 LTS)
-
-- If you use [Homebrew](https://brew.sh/) you can install node by doing:
-```
-brew install node
-```
-
-After installation check that everything is correctly installed and which versions you are running:
-```
-node -v
-npm -v
-```
-
-#### Project
-Clone project and install dependencies:
-```
-git clone https://github.com/elixir-europe/json-schema-validator.git
-cd json-schema-validator
-npm install
-```
-
-### Running the Tests
-```
-npm test
-```
-
-### Executing
-```
-node src/server
-```
-The node server will run on port **3020** and will expose one endpoint: **/validate**.
-
-#### Startup arguments
-
-- logPath
-
-If provided with a log path argument, the application will write the logs to a file on the specified directory with a 24h rotation. To provide the log path add a `logPath` property after the startup statement:
-```
-node src/server --logPath=/log/directory/path
-```
-
-- pidPath
-
-If provided with a pid file path argument, the application will write the pid into the specified file. If no pid file argument is provided, the application will still create a pid file on the default path: `./server.pid`.
-To provide the pid file path add a `pidPath` property after the startup statement:
-```
-node src/server --pidPath=/pid/file/path/server.pid
-```
-Note: This is the **file path** and not just the directory it will be written to.
-
-### Executing with Docker
-1. Build docker image:
-```
-docker build -t elixir-jsonschema-validator .
-```
-2. Run docker image:
-```
-docker run -p 3020:3020 -d elixir-jsonschema-validator
-```
-### Development
-For development purposes using [nodemon](https://nodemon.io/) is useful. It reloads the application everytime something has changed on save time.
-```
-nodemon src/server
-```
+If you would like to create your own service/repository using this library, you can check the code in that repository 
+and/or you can also check the [Usage](README.md#usage) section in this README.
 
 ## License
  For more details about licensing see the [LICENSE](LICENSE.md).
