@@ -8,4 +8,5 @@ ADD src ./src
 COPY package*.json ./
 
 RUN npm install
-CMD ["node", "./src/server.js"]
+
+CMD ["tail", "-f", "./src/app.js"]
