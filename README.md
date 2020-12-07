@@ -199,7 +199,7 @@ JSON object:
 ## Existing usage of this library
 You can see how to use this library in this GitHub repository: 
 [JSON Schema Validator service](https://github.com/EMBL-EBI-SUBS/json-schema-validator).
-Please follow the [Geting Started](https://github.com/EMBL-EBI-SUBS/json-schema-validator#getting-started) section 
+Please follow the [Getting Started](https://github.com/EMBL-EBI-SUBS/json-schema-validator#getting-started) section 
 of that repository to set up and execute your own running instance of that validator service into your machine.
 
 If you would like to create your own service/repository using this library, you can check the code in that repository 
