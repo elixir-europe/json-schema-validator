@@ -1,3 +1,7 @@
+:warning: **DEPRECATED**
+### This repository is archived now in favour of enhanced and supported version [biovalidator](https://github.com/elixir-europe/biovalidator). Please use [biovalidator](https://github.com/elixir-europe/biovalidator) repository for all future uses and references.
+***
+
 # JSON Schema Validator
 [![Build Status](https://travis-ci.org/EMBL-EBI-SUBS/json-schema-validator.svg?branch=master)](https://travis-ci.org/EMBL-EBI-SUBS/json-schema-validator)
 [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
